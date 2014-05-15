@@ -29,6 +29,8 @@ def correct_player_name(name):
     return False
 
 def main():
+    #TO DO: Check in XML DB to see if player exists.
+    
     try:
         query = sys.argv[1]
     except IndexError:
