@@ -27,6 +27,7 @@ python NFLplayerSentiments.py 'Aldon Smith'
 
 How it works
 ------------
-The most common words in the english dictionary have been assigned an 
++ The most common words in the english dictionary have been assigned an 
 arbritary "sentiment" value.
-That is, there is an injective function f, such that f(word) |-> sentiment
+
+- That is, there is an surjective function f, such that f(word) |-> sentiment
