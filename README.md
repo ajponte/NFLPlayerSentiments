@@ -19,4 +19,7 @@ For example, to find the Twitter sentiment of Aldon Smith, type
 python NFLplayerSentiments.py 'Aldon Smith'
 
 > python NFLplayerSentiments.py 'Jim Harbaugh'
-> Based on the query, Jim Harbaugh has a sentiment value of .00956001
+>> Based on the query, Jim Harbaugh has a sentiment value of .00956001
+
+The number returned, the sentiment value, is an integer value between 
++ or - 1, inclusive.
