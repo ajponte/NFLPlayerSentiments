@@ -34,6 +34,8 @@ arbritary "sentiment" value.
 - For example, f('Great') = .95
                f('terrible') = -.95
                f('cat') = 0.0
+- Using the API, the program grabs 100 Twitter status which include the name of the player.
+  The statuses are then analyzed and an average sentiment value is calculated.
 
 Giving credit where it's due:
 -----------------------------
