@@ -42,5 +42,6 @@ Giving credit where it's due:
 
 
 To be done at some point in the near fututre:
+-----------------------------------------------
 + Creaete a web interface with a scroll dowm, to pick a player.
 + Check in a database to verify that a given player actually exists.
