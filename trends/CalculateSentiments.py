@@ -1,3 +1,7 @@
+''' Calculates the sentiments from Tweets. 
+    @author: Alan Ponte
+'''
+
 from __future__ import print_function
 from getSentiments import load_sentiments
 import string
