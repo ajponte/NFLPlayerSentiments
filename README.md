@@ -15,7 +15,7 @@ Where QUERY is the name of a player (remember the quotes)
 
 OUTPUT:
 ================
-For example, to find the Twitter sentiment of Aldon Smith, type
+For example, to find the Twitter sentiment of Jim Harbaugh, type
 python NFLplayerSentiments.py 'Aldon Smith'
 
 > python NFLplayerSentiments.py 'Jim Harbaugh'
