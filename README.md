@@ -30,4 +30,5 @@ How it works
 + The most common words in the english dictionary have been assigned an 
 arbritary "sentiment" value.
 
-- That is, there is an surjective function f, such that f(word) |--> sentiment
+- That is, there is an surjective function f, such that f(word) = sentiment_value
+- For example, f('Great') = .95, f('terrible') = -.95, f('cat') = 0.0
