@@ -39,3 +39,8 @@ Giving credit where it's due:
 -----------------------------
 + I used a Twitter wrapper API to gather the Tweets.
 + The idea of assigning word sentiments arose during one of U.C. Berkeley's CS61a projects.
+
+
+To be done at some point in the near fututre:
++ Creaete a web interface with a scroll dowm, to pick a player.
++ Check in a database to verify that a given player actually exists.
