@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<link rel = "stylesheet" type = "text/css" href = "aboutStyles.css"/>
+		<script type="text/javascript"
+  			src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+		</script>
+		<title>
+			About
+		</title>
+	</head>
+	<body>
+		<div id = "container">
+			<div id = "header">
+				<h1> About NFL Player Sentiments Apps </h1>
+			</div>
+			<div id = "content">
+				<div id = "aboutParagraph">
+				<p> This App will allow you to to view how favorable your NFL teams are on twitter.
+				    It all starts with a mapping from words to sentiment values.
+				</P> 
+				<p> Let $$W := \lbrace words \in dictionary \rbrace$$.
+					For each word, there exists a surjective function $$F : W -> \lbrace x \in \mathbb{Z} : -1 \le x \le 1 \rbrace$$
+					such that $$F(w) = value$$  For example,
+					$$F(Bad) = -0.95$$ $$F(Good) = 0.95$$ $$F(Cat) = 0.0$$
+				</p>
+				<a href = "https://github.com/ajponte/NFLPlayerSentiments" target = "_blank"> View the source </a>
+
+				</div>
+
+			</div>
+			<div id = "footer">
+				Copywright &copy; 2014 Alan Ponte
+			</div>
+		</div>
+		<script src = "scripts/jquery.js"></script>
+		<script src = "scripts/jq_script.js"></script>
+	</body>
+</html>
