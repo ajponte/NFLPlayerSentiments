@@ -1,0 +1,43 @@
+body {
+	color: #EEE;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+#container {
+	background-color: white;
+	width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#header {
+	background-color: #66CCFF;
+	color: white;
+	text-align: center;
+	padding: 10px;
+}
+
+h1, h2, h3 {
+	margin: 0;
+}
+
+#aboutParagraph {
+
+	text-align: center;
+	color: black;
+}
+
+#footer {
+	clear: both;
+	padding: 10px;
+	background-color: #999;
+	color: white;
+	text-align: right;
+}
+
+a {
+	font-weight: bold;
+	float: right;
+	padding: 0;
+	text-decoration: none;
+}
