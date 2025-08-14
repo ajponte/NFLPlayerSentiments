@@ -52,8 +52,8 @@ def oauth_login(app_name=APP_NAME,
 
         print >> sys.stderr, "OAuth Success. Token file stored to", token_file
 
-    return twitter.Twitter(auth=twitter.oauth.OAuth(access_token, access_token_secret,
-                           consumer_key, consumer_secret))
+    return twitter.Twitter(auth=server.trends.getData.twitter.oauth.OAuth(access_token, access_token_secret,
+                                                                          consumer_key, consumer_secret))
     
 def search_for_query(query, count, file_name):
     """ Searches for the specified QUERY, outputting the max COUNT

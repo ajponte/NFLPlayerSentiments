@@ -5,7 +5,6 @@ import re
 import string
 import sys
 from datetime import datetime
-from ucb import main, interact
 
 
 # Look for data directory

@@ -74,7 +74,6 @@ CONSUMER_KEY = 'uS6hO2sV6tDKIOeVjhnFnQ'
 CONSUMER_SECRET = 'MEYTOS97VvlHX7K1rwHPEqVpTSqZ71HtvoK4sVuYk'
 
 from getopt import gnu_getopt as getopt, GetoptError
-from getpass import getpass
 import json
 import locale
 import os.path
@@ -97,10 +96,8 @@ try:
 except ImportError:
     import html.parser as HTMLParser
 
-import webbrowser
-
 from .api import Twitter, TwitterError
-from .oauth import OAuth, write_token_file, read_token_file
+from .oauth import OAuth, read_token_file
 from .oauth_dance import oauth_dance
 from . import ansi
 from .util import smrt_input, printNicely, align_text

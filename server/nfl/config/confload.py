@@ -1,0 +1,155 @@
+"""Loads config values into a running environment."""
+import os
+from typing import Any, Callable, Union
+
+# Converts a string key to another type.
+Converter = Callable[[str], Any]
+
+# A loader is a callable which returns a tuple of (key, val) where key
+# is a string (the loader takes no arguments).
+Loader = Callable[[], tuple[str, Any]]
+
+
+# Custom domain-level exceptions.
+class ConfigError(Exception):
+    """Raise this error when there's an issue with loading a config value."""
+    def __init__(self, message: str, cause: Exception | None = None):
+        self._message = message
+        self._cause = cause
+
+    @property
+    def message(self) -> str:
+        return self._message
+
+    @property
+    def cause(self) -> Exception | None:
+        return self._cause
+
+
+class MissingEnvironmentValueError(ConfigError):
+    """Raise this error when there should be a value for a specific key
+    in the environment."""
+    def __init__(self, key: str):
+        """
+        Constructor.
+
+        :param key: The key for which no value is present.
+        """
+        super().__init__(
+            f'Missing Environment variable for key: {key}'
+        )
+
+class InvalidEnvironmentVariableError(BaseException):
+    """Raise this error when there's a value for a specific key,
+    but the conversion fails."""
+    def __init__(self, key: str, value: str):
+        """
+        Constructor.
+
+        :param key: The key in the environment.
+        :param value: The value in the environment.
+        """
+        super().__init__(
+            f'Failed to load environment variable: {key}={value}'
+        )
+
+def get_environment_variable(
+    *,
+    key:str,
+    default: Any | None = None,
+    required_key: bool = False,
+    converter: Converter | None = None
+) -> Any:
+    """
+    Return any environment variable which matches the key.
+
+    :param key: The key to search for.
+    :param default: Any default value to return. If `required_key` is True, we
+                    ignore any default and instead raise an error.
+    :param converter: If present, attempt to convert the key to the desired type.
+    :param required_key: If True, raise an error if the key is not found in the environment.
+    :return: The environment variable which matches the key.
+    :raise: MissingEnvironmentValueError - If the key is required, and it does not exist.
+    :raise: InvalidEnvironmentVariableError - Upon any error while converting the value.
+    """
+    if key not in os.environ:
+        if required_key:
+            raise MissingEnvironmentValueError(key)
+        # Return (and convert) the default value
+        return converter(default) if converter else default
+
+    # Fetch and convert the environment value.
+    val = os.environ[key]
+    return converter(val) if converter else val
+
+def load_config(key: str, value: str) -> str:
+    """
+    Loads the key/value pair into the environment.
+
+    :param key: The key to load. Since we're loading OS configs, this is a string in all UPPER-CASE.
+    :param value: The value to load. Since we're loading OS configs, this is a string.
+    :return: The value as it exists in the OS config.
+    """
+    try:
+        os.environ[key.upper()] = value
+        return value
+    except Exception as e:
+        raise ConfigError(f'Error setting config key {key} in the environment') from e
+
+def required(key: str, converter: Converter | None) -> Loader:
+    """
+    Fetch a value from the environment and return is (as converted if needed).
+
+    :param key: The key to search for.
+    :param converter: The optional converter.
+    :return: A loader which will lazily-load the value. We do this by returning
+             the loader as a higher-order function, which when invoked will
+             return the key, value pair as a Tuple.
+    """
+    def loader() -> tuple[str, Any]:
+        return key, get_environment_variable(
+            key=key,
+            converter=converter,
+            required_key=True
+        )
+
+    return loader
+
+def optional(
+    *,
+    key: str,
+    default_val: None | str,
+    converter: None | Converter
+) -> Loader:
+    """
+    Assuming the key/value pair is optional, loads the pair from the environment.
+
+    :param key: The key to load.
+    :param default_val: The value to assign by default (since it's not required).
+    :param converter: An optional converter for the value in the environment.
+    :return: A higher order function, which when invoked will return the key,value pair as a tuple.
+    """
+    def loader() -> tuple[str, Any]:
+        return key, get_environment_variable(
+            key=key,
+            converter=converter,
+            default=default_val
+        )
+
+    return loader
+
+# Our first converter.
+def to_bool(val: Union[str, bool]) -> bool:
+    """
+    Converts a value to a boolean.
+
+    :param val: The value to convert (case-insensitive).
+    """
+    # Simple case
+    if isinstance(val, bool):
+        return val
+    if val.casefold() == 'false'.casefold():
+        return False
+    if val.casefold() == 'true'.casefold():
+        return True
+    raise ValueError(f'{val!r} could not be converted to a boolean type.')
