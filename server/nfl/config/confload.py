@@ -1,4 +1,5 @@
 """Loads config values into a running environment."""
+
 import os
 from typing import Any, Callable, Union
 
@@ -13,6 +14,7 @@ Loader = Callable[[], tuple[str, Any]]
 # Custom domain-level exceptions.
 class ConfigError(Exception):
     """Raise this error when there's an issue with loading a config value."""
+
     def __init__(self, message: str, cause: Exception | None = None):
         self._message = message
         self._cause = cause
@@ -29,19 +31,20 @@ class ConfigError(Exception):
 class MissingEnvironmentValueError(ConfigError):
     """Raise this error when there should be a value for a specific key
     in the environment."""
+
     def __init__(self, key: str):
         """
         Constructor.
 
         :param key: The key for which no value is present.
         """
-        super().__init__(
-            f'Missing Environment variable for key: {key}'
-        )
+        super().__init__(f"Missing Environment variable for key: {key}")
+
 
 class InvalidEnvironmentVariableError(BaseException):
     """Raise this error when there's a value for a specific key,
     but the conversion fails."""
+
     def __init__(self, key: str, value: str):
         """
         Constructor.
@@ -49,16 +52,15 @@ class InvalidEnvironmentVariableError(BaseException):
         :param key: The key in the environment.
         :param value: The value in the environment.
         """
-        super().__init__(
-            f'Failed to load environment variable: {key}={value}'
-        )
+        super().__init__(f"Failed to load environment variable: {key}={value}")
+
 
 def get_environment_variable(
     *,
-    key:str,
+    key: str,
     default: Any | None = None,
     required_key: bool = False,
-    converter: Converter | None = None
+    converter: Converter | None = None,
 ) -> Any:
     """
     Return any environment variable which matches the key.
@@ -82,6 +84,7 @@ def get_environment_variable(
     val = os.environ[key]
     return converter(val) if converter else val
 
+
 def load_config(key: str, value: str) -> str:
     """
     Loads the key/value pair into the environment.
@@ -94,7 +97,8 @@ def load_config(key: str, value: str) -> str:
         os.environ[key.upper()] = value
         return value
     except Exception as e:
-        raise ConfigError(f'Error setting config key {key} in the environment') from e
+        raise ConfigError(f"Error setting config key {key} in the environment") from e
+
 
 def required(key: str, converter: Converter | None) -> Loader:
     """
@@ -106,20 +110,17 @@ def required(key: str, converter: Converter | None) -> Loader:
              the loader as a higher-order function, which when invoked will
              return the key, value pair as a Tuple.
     """
+
     def loader() -> tuple[str, Any]:
         return key, get_environment_variable(
-            key=key,
-            converter=converter,
-            required_key=True
+            key=key, converter=converter, required_key=True
         )
 
     return loader
 
+
 def optional(
-    *,
-    key: str,
-    default_val: None | str,
-    converter: None | Converter
+    *, key: str, default_val: None | str, converter: None | Converter
 ) -> Loader:
     """
     Assuming the key/value pair is optional, loads the pair from the environment.
@@ -129,14 +130,14 @@ def optional(
     :param converter: An optional converter for the value in the environment.
     :return: A higher order function, which when invoked will return the key,value pair as a tuple.
     """
+
     def loader() -> tuple[str, Any]:
         return key, get_environment_variable(
-            key=key,
-            converter=converter,
-            default=default_val
+            key=key, converter=converter, default=default_val
         )
 
     return loader
+
 
 # Our first converter.
 def to_bool(val: Union[str, bool]) -> bool:
@@ -148,8 +149,8 @@ def to_bool(val: Union[str, bool]) -> bool:
     # Simple case
     if isinstance(val, bool):
         return val
-    if val.casefold() == 'false'.casefold():
+    if val.casefold() == "false".casefold():
         return False
-    if val.casefold() == 'true'.casefold():
+    if val.casefold() == "true".casefold():
         return True
-    raise ValueError(f'{val!r} could not be converted to a boolean type.')
+    raise ValueError(f"{val!r} could not be converted to a boolean type.")

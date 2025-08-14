@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import sys
+
 PY_3_OR_HIGHER = sys.version_info >= (3, 0)
 
 if PY_3_OR_HIGHER:
@@ -18,15 +19,15 @@ import sys, select, time
 
 from .api import TwitterCall, wrap_response, TwitterHTTPError
 
-CRLF = b'\r\n'
+CRLF = b"\r\n"
 MIN_SOCK_TIMEOUT = 0.0  # Apparenty select with zero wait is okay!
 MAX_SOCK_TIMEOUT = 10.0
 HEARTBEAT_TIMEOUT = 90.0
 
-Timeout = {'timeout': True}
-Hangup = {'hangup': True}
-DecodeError = {'hangup': True, 'decode_error': True}
-HeartbeatTimeout = {'hangup': True, 'heartbeat_timeout': True}
+Timeout = {"timeout": True}
+Hangup = {"hangup": True}
+DecodeError = {"hangup": True, "decode_error": True}
+HeartbeatTimeout = {"hangup": True, "heartbeat_timeout": True}
 
 
 class HttpChunkDecoder(object):
@@ -59,7 +60,7 @@ class HttpChunkDecoder(object):
             header = buf[:header_end_pos]
             data_start_pos = header_end_pos + 2
             try:
-                chunk_len = int(header.decode('ascii'), 16)
+                chunk_len = int(header.decode("ascii"), 16)
             except ValueError:
                 decode_error = True
                 break
@@ -159,10 +160,17 @@ class TwitterJSONIter(object):
             self.heartbeat_timeout = float(heartbeat_timeout)
 
     def __iter__(self):
-        timeouts = [t for t in (self.timeout, self.heartbeat_timeout, MAX_SOCK_TIMEOUT)
-                    if t is not None]
+        timeouts = [
+            t
+            for t in (self.timeout, self.heartbeat_timeout, MAX_SOCK_TIMEOUT)
+            if t is not None
+        ]
         sock_timeout = min(*timeouts)
-        sock = self.handle.fp.raw._sock if PY_3_OR_HIGHER else self.handle.fp._sock.fp._sock
+        sock = (
+            self.handle.fp.raw._sock
+            if PY_3_OR_HIGHER
+            else self.handle.fp._sock.fp._sock
+        )
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         headers = self.handle.headers
         sock_reader = SockReader(sock, sock_timeout)
@@ -205,10 +213,15 @@ class TwitterJSONIter(object):
 
 def handle_stream_response(req, uri, arg_data, block, timeout, heartbeat_timeout):
     try:
-        handle = urllib_request.urlopen(req,)
+        handle = urllib_request.urlopen(
+            req,
+        )
     except urllib_error.HTTPError as e:
-        raise TwitterHTTPError(e, uri, 'json', arg_data)
-    return iter(TwitterJSONIter(handle, uri, arg_data, block, timeout, heartbeat_timeout))
+        raise TwitterHTTPError(e, uri, "json", arg_data)
+    return iter(
+        TwitterJSONIter(handle, uri, arg_data, block, timeout, heartbeat_timeout)
+    )
+
 
 class TwitterStream(TwitterCall):
     """
@@ -243,18 +256,33 @@ class TwitterStream(TwitterCall):
     stream data, or `None`. Note that `timeout` supercedes this
     argument, so it should also be set `None` to use this mode.
     """
-    def __init__(self, domain="stream.twitter.com", secure=True, auth=None,
-                 api_version='1.1', block=True, timeout=None,
-                 heartbeat_timeout=90.0):
+
+    def __init__(
+        self,
+        domain="stream.twitter.com",
+        secure=True,
+        auth=None,
+        api_version="1.1",
+        block=True,
+        timeout=None,
+        heartbeat_timeout=90.0,
+    ):
         uriparts = (str(api_version),)
 
         class TwitterStreamCall(TwitterCall):
             def _handle_response(self, req, uri, arg_data, _timeout=None):
                 return handle_stream_response(
-                    req, uri, arg_data, block,
-                    _timeout or timeout, heartbeat_timeout)
+                    req, uri, arg_data, block, _timeout or timeout, heartbeat_timeout
+                )
 
         TwitterCall.__init__(
-            self, auth=auth, format="json", domain=domain,
+            self,
+            auth=auth,
+            format="json",
+            domain=domain,
             callable_cls=TwitterStreamCall,
-            secure=secure, uriparts=uriparts, timeout=timeout, gzip=False)
+            secure=secure,
+            uriparts=uriparts,
+            timeout=timeout,
+            gzip=False,
+        )

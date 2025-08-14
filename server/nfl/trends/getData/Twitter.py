@@ -1,6 +1,3 @@
-''' Functions for Traversing Twitter.
-    @author Alan Ponte
-'''
 import sys
 import os
 import json
@@ -23,14 +20,14 @@ def search(t, q=None, max_batches=5, count=80):
     for _ in range(max_batches):
         try:
             next_results = search_results['search_metadata']['next_results']
-        except KeyError, e: # No more results when next_results doesn't exist
+        except KeyError as e: # No more results when next_results doesn't exist
             break
-            # Create a dictionary from next_results, which has the following form:
-            # ?max_id=313519052523986943&q=%23MentionSomeoneImportantForYou&include_entities=1
-            kwargs = dict([ kv.split('=') for kv in next_results[1:].split("&") ])
-            search_results = twitter_api.search.tweets(**kwargs)
-            print("found satus : ", search_results['statuses'])
-            statuses += search_results['statuses']
+        # Create a dictionary from next_results, which has the following form:
+        # ?max_id=313519052523986943&q=%23MentionSomeoneImportantForYou&include_entities=1
+        kwargs = dict([ kv.split('=') for kv in next_results[1:].split("&") ])
+        search_results = twitter_api.search.tweets(**kwargs)
+        print("found satus : ", search_results['statuses'])
+        statuses += search_results['statuses']
 
     return statuses
 

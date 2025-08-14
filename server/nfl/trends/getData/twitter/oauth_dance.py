@@ -12,7 +12,6 @@ except NameError:
     _input = input
 
 
-
 def oauth_dance(app_name, consumer_key, consumer_secret, token_filename=None):
     """
     Perform the OAuth dance with some command-line prompts. Return the
@@ -28,52 +27,59 @@ def oauth_dance(app_name, consumer_key, consumer_secret, token_filename=None):
     """
     print("Hi there! We're gonna get you all set up to use %s." % app_name)
     twitter = Twitter(
-        auth=OAuth('', '', consumer_key, consumer_secret),
-        format='', api_version=None)
-    oauth_token, oauth_token_secret = parse_oauth_tokens(
-        twitter.oauth.request_token())
-    print("""
+        auth=OAuth("", "", consumer_key, consumer_secret), format="", api_version=None
+    )
+    oauth_token, oauth_token_secret = parse_oauth_tokens(twitter.oauth.request_token())
+    print(
+        """
 In the web browser window that opens please choose to Allow
 access. Copy the PIN number that appears on the next page and paste or
 type it here:
-""")
-    oauth_url = ('https://api.twitter.com/oauth/authorize?oauth_token=' +
-                 oauth_token)
+"""
+    )
+    oauth_url = "https://api.twitter.com/oauth/authorize?oauth_token=" + oauth_token
     print("Opening: %s\n" % oauth_url)
 
     try:
         r = webbrowser.open(oauth_url)
-        time.sleep(2) # Sometimes the last command can print some
-                      # crap. Wait a bit so it doesn't mess up the next
-                      # prompt.
+        time.sleep(2)  # Sometimes the last command can print some
+        # crap. Wait a bit so it doesn't mess up the next
+        # prompt.
         if not r:
             raise Exception()
     except:
-        print("""
+        print(
+            """
 Uh, I couldn't open a browser on your computer. Please go here to get
 your PIN:
 
-""" + oauth_url)
+"""
+            + oauth_url
+        )
     oauth_verifier = _input("Please enter the PIN: ").strip()
     twitter = Twitter(
-        auth=OAuth(
-            oauth_token, oauth_token_secret, consumer_key, consumer_secret),
-        format='', api_version=None)
+        auth=OAuth(oauth_token, oauth_token_secret, consumer_key, consumer_secret),
+        format="",
+        api_version=None,
+    )
     oauth_token, oauth_token_secret = parse_oauth_tokens(
-        twitter.oauth.access_token(oauth_verifier=oauth_verifier))
+        twitter.oauth.access_token(oauth_verifier=oauth_verifier)
+    )
     if token_filename:
-        write_token_file(
-            token_filename, oauth_token, oauth_token_secret)
+        write_token_file(token_filename, oauth_token, oauth_token_secret)
         print()
-        print("That's it! Your authorization keys have been written to %s." % (
-            token_filename))
+        print(
+            "That's it! Your authorization keys have been written to %s."
+            % (token_filename)
+        )
     return oauth_token, oauth_token_secret
 
+
 def parse_oauth_tokens(result):
-    for r in result.split('&'):
-        k, v = r.split('=')
-        if k == 'oauth_token':
+    for r in result.split("&"):
+        k, v = r.split("=")
+        if k == "oauth_token":
             oauth_token = v
-        elif k == 'oauth_token_secret':
+        elif k == "oauth_token_secret":
             oauth_token_secret = v
     return oauth_token, oauth_token_secret
