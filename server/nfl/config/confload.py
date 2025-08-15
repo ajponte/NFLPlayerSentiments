@@ -85,7 +85,7 @@ def get_environment_variable(
     return converter(val) if converter else val
 
 
-def load_config(key: str, value: str) -> str:
+def load_config(*, key: str, value: str) -> str:
     """
     Loads the key/value pair into the environment.
 
@@ -100,7 +100,7 @@ def load_config(key: str, value: str) -> str:
         raise ConfigError(f"Error setting config key {key} in the environment") from e
 
 
-def required(key: str, converter: Converter | None) -> Loader:
+def required(*, key: str, converter: Converter | None = None) -> Loader:
     """
     Fetch a value from the environment and return is (as converted if needed).
 
