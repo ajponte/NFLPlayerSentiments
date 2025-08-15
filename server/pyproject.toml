@@ -8,6 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.13"
+hvac = "^2.3.0"
 
 [tool.poetry.group.test.dependencies]
 black = "25.1.0"
