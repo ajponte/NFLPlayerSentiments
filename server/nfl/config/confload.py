@@ -3,6 +3,8 @@
 import os
 from typing import Any, Callable, Union
 
+from nfl.config.hashicorp import OpenBaoApiClient
+
 # Converts a string key to another type.
 Converter = Callable[[str], Any]
 
@@ -40,8 +42,18 @@ class MissingEnvironmentValueError(ConfigError):
         """
         super().__init__(f"Missing Environment variable for key: {key}")
 
+class MissingSecretsKey(ConfigError):
+    """Raise this error when there's no secret key found for a path."""
+    def __init__(self, path: str, key: str):
+        """
+        Constructor.
 
-class InvalidEnvironmentVariableError(BaseException):
+        :param path: The path for which the key is not present.
+        :param key: The key for which no value is present.
+        """
+        super().__init__(f"Missing Secret Key {key} at path {path}")
+
+class InvalidEnvironmentVariableError(ConfigError):
     """Raise this error when there's a value for a specific key,
     but the conversion fails."""
 
@@ -84,6 +96,24 @@ def get_environment_variable(
     val = os.environ[key]
     return converter(val) if converter else val
 
+def get_secret_value(path: str, key: str, converter: Converter| None = None) -> Any:
+    """
+    Return the secret value for the key at the path.
+
+    :param path: The path the secret is stored under.
+    :param key: The key to fetch.
+    :param converter: Optional converter.
+    :return: The secret value.
+    """
+    # Open an openbao client, using preset env vars.
+    openbao = OpenBaoApiClient()
+    secrets_response = openbao.read_secret_value(path=path)
+    ver = secrets_response['metadata']['version']
+    print(f'Found secrets version: {ver}')
+    secrets = secrets_response['data']
+    if key not in secrets:
+        raise MissingSecretsKey(path=path, key=key)
+    return converter(secrets[key]) if converter else secrets[key]
 
 def load_config(*, key: str, value: str) -> str:
     """
@@ -116,6 +146,30 @@ def required(*, key: str, converter: Converter | None = None) -> Loader:
             key=key, converter=converter, required_key=True
         )
 
+    return loader
+
+def required_secret(
+        *,
+        key: str,
+        path: str | None = None,
+        converter: Converter | None = None
+) -> Loader:
+    """
+    Fetch a required secret from the secrets manager (as converted if needed).
+
+    :param key: The key to search for.
+    :param path: The path the secret is stored under. If not path is supplied a default
+                 is assumed, whose value exists in the environment.
+    :param converter: The optional converter.
+    :return: A loader which will lazily-load the value. We do this by returning
+             the loader as a higher-order function, which when invoked will
+             return the key, value pair as a Tuple.
+    """
+    path = path or os.environ['OPENBAO_SECRETS_PATH']
+    def loader() -> tuple[str, Any]:
+        return key, get_secret_value(
+            key=key, path=path, converter=converter
+        )
     return loader
 
 

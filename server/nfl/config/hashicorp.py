@@ -27,6 +27,8 @@ class OpenBaoApiClient:
             url=os.environ.get('BAO_ADDR', None),
             token=os.environ.get('VAULT_TOKEN', None)
         )
+        self.__is_authenticated(self._client)
+        print('Hashicorp Secrets client authenticated.')
 
 
     def add_secret_value(self, *, path: str, secret: dict) -> dict:
@@ -71,15 +73,19 @@ class OpenBaoApiClient:
             print(message)
             raise SecretsManagerException(message, cause=e) from e
 
-def test_bao():
-    client = OpenBaoApiClient()
-    assert client._client.is_authenticated()
-    print('Bao authenticated')
+    @classmethod
+    def __is_authenticated(cls, client: hvac.Client):
+        """Return True only if the Client has been authenticated."""
+        assert client.is_authenticated(), 'Hashicorp is not authenticated!'
 
-    client.add_secret_value(path='test', secret={'foo': 'bar'})
-
-    resp = client.read_secret_value(path='test')
-    print(f'resp: {resp}')
-
-
-test_bao()
+# def test_bao():
+#     client = OpenBaoApiClient()
+#     assert client._client.is_authenticated()
+#     print('Bao authenticated')
+#
+#     client.add_secret_value(path='test', secret={'foo': 'bar'})
+#
+#     resp = client.read_secret_value(path='test')
+#     print(f'resp: {resp}')
+#
+# test_bao()
