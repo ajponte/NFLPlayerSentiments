@@ -3,7 +3,7 @@
 import os
 from typing import Any, Callable, Union
 
-from nfl.config.hashicorp import OpenBaoApiClient
+from nfl.config.hashicorp import OpenBaoApiClient, BaoSecretsManager
 
 # Converts a string key to another type.
 Converter = Callable[[str], Any]
@@ -106,14 +106,11 @@ def get_secret_value(path: str, key: str, converter: Converter| None = None) -> 
     :return: The secret value.
     """
     # Open an openbao client, using preset env vars.
-    openbao = OpenBaoApiClient()
-    secrets_response = openbao.read_secret_value(path=path)
-    ver = secrets_response['metadata']['version']
-    print(f'Found secrets version: {ver}')
-    secrets = secrets_response['data']
-    if key not in secrets:
+    secrets_manager = BaoSecretsManager()
+    secrets: dict = secrets_manager.get_secret(path=path, key=key)
+    if key not in secrets.values():
         raise MissingSecretsKey(path=path, key=key)
-    return converter(secrets[key]) if converter else secrets[key]
+    return converter(secrets['val']) if converter else secrets['val']
 
 def load_config(*, key: str, value: str) -> str:
     """
