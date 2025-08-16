@@ -1,3 +1,5 @@
+[![sentiments Server](https://github.com/ajponte/NFLPlayerSentiments/actions/workflows/python-publish.yml/badge.svg?branch=master)](https://github.com/ajponte/NFLPlayerSentiments/actions/workflows/python-publish.yml)
+
 NFLPlayerSentiments
 ===================
 
