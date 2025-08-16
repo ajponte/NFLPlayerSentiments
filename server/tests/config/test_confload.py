@@ -2,7 +2,7 @@ from xmlrpc.client import Fault
 
 import pytest
 
-from server.nfl.config.confload import to_bool
+from nfl.config.confload import to_bool
 
 
 @pytest.mark.parametrize(
