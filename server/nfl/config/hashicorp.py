@@ -65,6 +65,7 @@ class OpenBaoApiClient:
         :raise: SecretsManagerException - Upon error.
         """
         try:
+            # todo: add version checking.
             read_response = self._client.secrets.kv.read_secret_version(
                 path=path,
                 # See https://github.com/hvac/hvac/pull/907

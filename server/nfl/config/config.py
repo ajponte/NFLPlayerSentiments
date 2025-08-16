@@ -1,13 +1,15 @@
 """Application-level configs."""
 from typing import Any
 
-from nfl.config.confload import Loader, required, required_secret
+from nfl.config.confload import Loader, required, required_secret, optional
 
 CONFIG_LOADERS: list[Loader] = [
-    # In a production system, secrets would derive from a secrets' manager.
-    required(key='X_DOT_COM_API_SECRET'),
-    required(key='X_DOT_COM_API_KEY'),
-    required_secret(key='foo', path='test')
+    optional(key='OPENBAO_SECRETS_PATH', default_val='test'),
+]
+
+SECRETS_LOADERS: list[Loader] = [
+    required_secret(key='X_DOT_COM_API_SECRET', path='test'),
+    required_secret(key='X_DOT_COM_API_KEY', path='test'),
 ]
 
 def update_config_from_environment(config: dict[str, Any]) -> None:
@@ -18,4 +20,9 @@ def update_config_from_environment(config: dict[str, Any]) -> None:
     """
     config.update(
         dict(loader() for loader in CONFIG_LOADERS)
+    )
+
+def update_config_from_secrets(config: dict[str, Any]) -> None:
+    config.update(
+        dict(loader() for loader in SECRETS_LOADERS)
     )
