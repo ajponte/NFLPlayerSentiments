@@ -174,7 +174,7 @@ def required_secret(
 
 
 def optional(
-    *, key: str, default_val: None | str, converter: None | Converter
+    *, key: str, default_val: str | None, converter: Converter | None = None
 ) -> Loader:
     """
     Assuming the key/value pair is optional, loads the pair from the environment.
