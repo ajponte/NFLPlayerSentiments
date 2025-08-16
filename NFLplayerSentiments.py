@@ -6,8 +6,8 @@
 
 from __future__ import print_function
 import sys
-from trends.outputSentiments import get_sentiments
-from trends.outputSentiments import create_sentiment_report
+from server.nfl.trends import get_sentiments
+from server.nfl.trends import create_sentiment_report
 import xml.etree.ElementTree as ET
 
 def createReport(query):
