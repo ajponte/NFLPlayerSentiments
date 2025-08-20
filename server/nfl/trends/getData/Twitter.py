@@ -38,7 +38,7 @@ def oauth_login(app_name=APP_NAME,
 
     try:
         (access_token, access_token_secret) = read_token_file(token_file)
-    except IOError, e:
+    except IOError as e:
         (access_token, access_token_secret) = oauth_dance(app_name, consumer_key,
                 consumer_secret)
 
