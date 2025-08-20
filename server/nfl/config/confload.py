@@ -205,3 +205,11 @@ def to_bool(val: Union[str, bool]) -> bool:
     if val.casefold() == "true".casefold():
         return True
     raise ValueError(f"{val!r} could not be converted to a boolean type.")
+
+def to_int(val: Union[str, int, float]) -> int:
+    """Convert the value to an integer."""
+    try:
+        # The value is assumed to be in integer.
+        return int(val)
+    except Exception:
+        raise ValueError(f"{val!r} could not be converted to a integer type.")
