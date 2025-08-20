@@ -19,7 +19,8 @@ def configure_x_api_client(config: dict[str, Any]) -> 'XApiClient':
     return XApiClient(
         bearer=config['X_DOT_COM_BEARER_TOKEN'],
         wait_on_limit=config['X_DOT_COM_WAIT_ON_RATE_LIMIT'],
-        webscrape_backup=config['X_DOT_COM_WEBSCRAPE_BACKUP']
+        webscrape_backup=config['X_DOT_COM_WEBSCRAPE_BACKUP'],
+        cache_csv_file=config['CACHE_FILE']
     )
 
 
@@ -29,6 +30,7 @@ class XApiClient:
         bearer: str,
         wait_on_limit: bool,
         webscrape_backup: bool,
+        cache_csv_file: str
     ):
         """Constructor."""
         self._webscrape_backup = webscrape_backup
@@ -38,18 +40,17 @@ class XApiClient:
             # Wait on rate limit
             wait_on_rate_limit=wait_on_limit
         )
+        self._cache_csv = cache_csv_file
 
     def search_posts(
         self,
         query: str,
-        csv_output: str,
         max_results:int=DEFAULT_MAX_RESULTS
     ) -> Any:
         """
         Perform a search on publicly available posts, and persist to a file.
 
         :param query: The query which the X API understands.
-        :param csv_output: CSV file to write the data to.
         :param max_results: The max number of posts to search.
         """
         results = None
@@ -66,7 +67,7 @@ class XApiClient:
             results = _scrape_tweets(query=query, max_results=max_results)
         finally:
             # Save any results to csv.
-            _save_to_csv(results, filename=csv_output)
+            _save_to_csv(results, filename=self._cache_csv)
         return results
 
     def _search_recent_tweets(
@@ -118,7 +119,7 @@ class XApiClient:
             ])
         return results
 
-def _save_to_csv(tweets: list, filename="tweets.csv") -> None:
+def _save_to_csv(tweets: list, filename: str) -> None:
     with open(filename, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["id", "created_at", "author_id", "text", "like_count", "retweet_count"])

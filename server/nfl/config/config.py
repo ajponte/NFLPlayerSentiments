@@ -23,6 +23,11 @@ CONFIG_LOADERS: list[Loader] = [
     optional(
         key='X_DOT_CON_MAX_RESULTS',
         default_val='20'
+    ),
+
+    optional(
+        key='CACHE_FILE',
+        default_val='cache.csv'
     )
 ]
 
