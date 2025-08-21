@@ -1,0 +1,3 @@
+[submodule "server/snscrape"]
+	path = server/snscrape
+	url = https://github.com/ajponte/snscrape

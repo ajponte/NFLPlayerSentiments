@@ -6,6 +6,7 @@ from typing import Any
 from tweepy import Response
 
 from nfl.error import DownstreamApiException
+from nfl.services.scraper import XSnsScraper
 
 DEFAULT_FIELDS = ["created_at", "author_id", "public_metrics"]
 
@@ -64,9 +65,15 @@ class XApiClient:
             message = f"Unknown exception while fetching tweets: {e}"
             if not self._webscrape_backup:
                 raise DownstreamApiException(message=message, cause=e) from e
-            results = _scrape_tweets(query=query, max_results=max_results)
+            results = (
+                XSnsScraper(max_results=max_results).scrape(query)
+            )
+            # results = (
+            #     XPlaywrightScrapper(max_results=max_results).scrape(query)
+            # )
         finally:
             # Save any results to csv.
+            results = results or []
             _save_to_csv(results, filename=self._cache_csv)
         return results
 
@@ -127,20 +134,20 @@ def _save_to_csv(tweets: list, filename: str) -> None:
             writer.writerow(t)
     print(f"Saved {len(tweets)} tweets to {filename}")
 
-def _scrape_tweets(query: str, max_results: int):
-    """Fallback scraper using snscrape if API rate limited."""
-    import snscrape.modules.twitter as sntwitter
-    print("Falling back to scraping...")
-    scraped = []
-    for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
-        if i >= max_results:
-            break
-        scraped.append([
-            tweet.id,
-            tweet.date,
-            tweet.user.username,
-            tweet.content.replace("\n", " "),
-            tweet.likeCount,
-            tweet.retweetCount
-        ])
-    return scraped
+# def _scrape_tweets(query: str, max_results: int):
+#     """Fallback scraper using snscrape if API rate limited."""
+#     import snscrape.modules.twitter as sntwitter
+#     print("Falling back to scraping...")
+#     scraped = []
+#     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
+#         if i >= max_results:
+#             break
+#         scraped.append([
+#             tweet.id,
+#             tweet.date,
+#             tweet.user.username,
+#             tweet.content.replace("\n", " "),
+#             tweet.likeCount,
+#             tweet.retweetCount
+#         ])
+#     return scraped
